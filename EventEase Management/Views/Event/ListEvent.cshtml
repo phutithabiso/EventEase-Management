@@ -1,0 +1,313 @@
+﻿@model EventEase_Management.Models.EventListModelView
+
+@{
+    ViewData["Title"] = "Events";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            color: #34495e;
+        }
+
+        h1 {
+            color: #2c3e50;
+            font-weight: 600;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 25px;
+        }
+
+        .btn-primary {
+            background-color: #3498db;
+            border-color: #3498db;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: 500;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+            .btn-primary:hover {
+                background-color: #2980b9;
+                border-color: #2980b9;
+                transform: translateY(-1px);
+                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            }
+
+        .nav-tabs {
+            border-bottom: 2px solid #dee2e6;
+        }
+
+            .nav-tabs .nav-link {
+                color: #7f8c8d;
+                font-weight: 500;
+                border: none;
+                padding: 12px 20px;
+                margin-right: 5px;
+                transition: all 0.3s;
+            }
+
+                .nav-tabs .nav-link:hover {
+                    color: #3498db;
+                    background-color: rgba(52, 152, 219, 0.1);
+                }
+
+                .nav-tabs .nav-link.active {
+                    color: #3498db;
+                    background-color: transparent;
+                    border-bottom: 3px solid #3498db;
+                    font-weight: 600;
+                }
+
+        .table {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+            .table thead th {
+                background-color: #2c3e50;
+                color: white;
+                font-weight: 500;
+                border: none;
+                padding: 15px;
+            }
+
+            .table tbody tr {
+                transition: all 0.2s;
+            }
+
+                .table tbody tr:hover {
+                    background-color: rgba(52, 152, 219, 0.05);
+                }
+
+            .table td, .table th {
+                vertical-align: middle;
+                padding: 12px 15px;
+                border-top: 1px solid #ecf0f1;
+            }
+
+        .badge {
+            padding: 6px 10px;
+            font-size: 12px;
+            font-weight: 500;
+            border-radius: 4px;
+            text-transform: capitalize;
+        }
+
+        .badge-success {
+            background-color: #27ae60;
+        }
+
+        .badge-warning {
+            background-color: #f39c12;
+        }
+
+        .badge-secondary {
+            background-color: #95a5a6;
+        }
+
+        .img-thumbnail {
+            border: 1px solid #dfe6e9;
+            border-radius: 4px;
+            padding: 2px;
+            transition: all 0.3s;
+        }
+
+            .img-thumbnail:hover {
+                transform: scale(1.05);
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            }
+
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 14px;
+            border-radius: 4px;
+            margin: 0 2px;
+        }
+
+        .btn-danger {
+            background-color: #e74c3c;
+            border-color: #e74c3c;
+        }
+
+            .btn-danger:hover {
+                background-color: #c0392b;
+                border-color: #c0392b;
+            }
+
+        .no-events {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            color: #7f8c8d;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+        }
+
+            .no-events i {
+                font-size: 40px;
+                color: #bdc3c7;
+                margin-bottom: 15px;
+            }
+
+        .action-buttons {
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1>Event Management</h1>
+            <a asp-action="Index" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Add New Event
+            </a>
+        </div>
+
+        <ul class="nav nav-tabs" id="eventTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a class="nav-link active" id="upcoming-tab" data-toggle="tab" href="#upcoming" role="tab">
+                    <i class="fas fa-calendar-alt mr-2"></i>Upcoming
+                </a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="past-tab" data-toggle="tab" href="#past" role="tab">
+                    <i class="fas fa-history mr-2"></i>Past
+                </a>
+            </li>
+        </ul>
+
+        <div class="tab-content mt-3" id="eventTabsContent">
+            <!-- Upcoming Events -->
+            <div class="tab-pane fade show active" id="upcoming" role="tabpanel">
+                @if (Model.UpcomingEvents.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th style="width: 120px;">Image</th>
+                                    <th>Event Name</th>
+                                    <th style="width: 150px;">Date</th>
+                                    <th>Venue</th>
+                                    <th style="width: 120px;">Status</th>
+                                    <th>Description</th>
+                                    <th style="width: 150px;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.UpcomingEvents)
+                                {
+                                    <tr>
+                                        <td>
+                                            <img src="@item.ImageUrl" alt="Event Image" class="img-thumbnail" style="width: 100px; height: auto;" onerror="this.src='https://via.placeholder.com/100?text=No+Image'" />
+                                        </td>
+                                        <td>@item.Name</td>
+                                        <td>@item.Date.ToString("MMM dd, yyyy")</td>
+                                        <td>@item.Venues.Name</td>
+                                        <td>
+                                            <span class="badge badge-@(item.Status.ToLower() == "confirmed" ? "success" : "warning")">
+                                                @item.Status
+                                            </span>
+                                        </td>
+                                        <td>
+                                            @(item.Description.Length > 50 ? item.Description.Substring(0, Math.Min(item.Description.Length, 50)) + "..." : item.Description)
+                                        </td>
+                                        <td class="action-buttons">
+                                            <a class="btn btn-sm btn-primary" asp-action="Details" asp-route-id="@item.EventID" title="Details">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a class="btn btn-sm btn-primary" asp-action="Edit" asp-route-id="@item.EventID" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@item.EventID" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="no-events">
+                        <i class="fas fa-calendar-times"></i>
+                        <h4>No Upcoming Events</h4>
+                        <p>There are currently no upcoming events scheduled.</p>
+                    </div>
+                }
+            </div>
+
+            <!-- Past Events -->
+            <div class="tab-pane fade" id="past" role="tabpanel">
+                @if (Model.PastEvents.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th style="width: 120px;">Image</th>
+                                    <th>Event Name</th>
+                                    <th style="width: 150px;">Date</th>
+                                    <th>Venue</th>
+                                    <th style="width: 120px;">Status</th>
+                                    <th>Description</th>
+                                    <th style="width: 150px;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.PastEvents)
+                                {
+                                    <tr>
+                                        <td>
+                                            <img src="@item.ImageUrl" alt="Event Image" class="img-thumbnail" style="width: 100px; height: auto;" onerror="this.src='https://via.placeholder.com/100?text=No+Image'" />
+                                        </td>
+                                        <td>@item.Name</td>
+                                        <td>@item.Date.ToString("MMM dd, yyyy")</td>
+                                        <td>@item.Venues.Name</td>
+                                        <td>
+                                            <span class="badge badge-secondary">Completed</span>
+                                        </td>
+                                        <td>
+                                            @(item.Description.Length > 50 ? item.Description.Substring(0, Math.Min(item.Description.Length, 50)) + "..." : item.Description)
+                                        </td>
+                                        <td class="action-buttons">
+                                            <a class="btn btn-sm btn-primary" asp-action="Details" asp-route-id="@item.EventID" title="Details">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@item.EventID" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="no-events">
+                        <i class="fas fa-history"></i>
+                        <h4>No Past Events</h4>
+                        <p>There are no past events in the records.</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</body>
+</html>

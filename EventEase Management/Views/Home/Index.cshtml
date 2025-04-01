@@ -1,8 +1,284 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
+﻿@model EventEase_Management.Models.DashboardModelView
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="dashboard-container">
+    <h2 class="mb-4 text-center">Dashboard</h2>
+
+    <!-- Stats Cards -->
+    <div class="stats-container">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-calendar-check"></i>
+            </div>
+            <div class="stat-content">
+                <h3>Total Bookings</h3>
+                <p class="stat-value">@Model.TotalBookings</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-calendar-alt"></i>
+            </div>
+            <div class="stat-content">
+                <h3>Active Events</h3>
+                <p class="stat-value">@Model.ActiveEvents</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-map-marker-alt"></i>
+            </div>
+            <div class="stat-content">
+                <h3>Available Venues</h3>
+                <p class="stat-value">@Model.AvailableVenues</p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Content Sections -->
+    <div class="dashboard-sections">
+        <!-- Upcoming Events -->
+        <div class="dashboard-section">
+            <h2 class="section-title">Upcoming Events</h2>
+            @if (Model.UpcomingEvents.Any())
+            {
+                <div class="table-responsive">
+                    <table class="dashboard-table">
+                        <thead class="thead-dark bg-dark text-white">
+                            <tr>
+                                <th>Event</th>
+                                <th>Venue</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var eventItem in Model.UpcomingEvents)
+                            {
+                                <tr>
+                                    <td>@eventItem.Name</td>
+                                    <td>@eventItem.Venues.Name</td>
+                                    <td>@eventItem.Date.ToString("yyyy-MM-dd")</td>
+                                    <td><span class="status-badge @eventItem.Status.ToLower()">@eventItem.Status</span></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="empty-state">
+                    <i class="fas fa-calendar-times"></i>
+                    <p>No upcoming events scheduled</p>
+                </div>
+            }
+        </div>
+
+        <!-- Recent Bookings -->
+        <div class="dashboard-section">
+            <h2 class="section-title">Recent Bookings</h2>
+            @if (Model.RecentBookings.Any())
+            {
+                <div class="table-responsive">
+                    <table class="dashboard-table">
+                        <thead class="thead-dark bg-dark text-white">
+                            <tr>
+                                <th>Customer</th>
+                                <th>Venue</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var booking in Model.RecentBookings)
+                            {
+                                <tr>
+                                    <td>@booking.CustomerName</td>
+                                    <td>@booking.Venue.Name</td>
+                                    <td>@booking.BookingDate.ToString("yyyy-MM-dd")</td>
+                                    <td><span class="status-badge @booking.Status.ToLower()">@booking.Status</span></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="empty-state">
+                    <i class="fas fa-book"></i>
+                    <p>No recent bookings found</p>
+                </div>
+            }
+        </div>
+    </div>
 </div>
+
+<style>
+
+    ::root {
+        --primary-color: #2C3E50;
+        --secondary-color: #fff;
+        --accent-color: #95A5A6;
+        --success-color: #2ECC71;
+        --warning-color: #F39C12;
+        --danger-color: #E74C3C;
+        --light-color: #ECF0F1;
+        --dark-color: #2C3E50;
+        --border-radius: 8px;
+        --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f5f7fa;
+        color: var(--dark-color);
+    }
+
+    .dashboard-container {
+        padding: 2rem;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .dashboard-title {
+        color: var(--primary-color);
+        margin-bottom: 2rem;
+        font-weight: 600;
+        border-bottom: 2px solid var(--accent-color);
+        padding-bottom: 0.5rem;
+    }
+
+
+    .stats-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        box-shadow: var(--box-shadow);
+        display: flex;
+        align-items: center;
+        transition: transform 0.3s ease;
+        border-left: 4px solid var(--primary-color);
+    }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+    .stat-icon {
+        font-size: 2rem;
+        color: var(--primary-color);
+        margin-right: 1.5rem;
+    }
+
+    .stat-content h3 {
+        font-size: 1rem;
+        color: var(--accent-color);
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+    }
+
+    .stat-value {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--dark-color);
+        margin: 0;
+    }
+
+    .dashboard-sections {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    .section-title {
+        font-size: 1.25rem;
+        color: var(--secondary-color);
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+
+    .dashboard-section {
+        background: white;
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        box-shadow: var(--box-shadow);
+        border-top: 3px solid var(--primary-color);
+    }
+
+    .dashboard-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .dashboard-table thead th {
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        .dashboard-table tbody td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .dashboard-table tbody tr:hover {
+            background-color: var(--light-color);
+        }
+
+    .status-badge {
+        display: inline-block;
+        padding: 0.35rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: capitalize;
+    }
+
+        .status-badge.confirmed {
+            background-color: rgba(40, 167, 69, 0.1);
+            color: #28a745;
+        }
+
+        .status-badge.pending {
+            background-color: rgba(255, 193, 7, 0.1);
+            color: #ffc107;
+        }
+
+        .status-badge.cancelled {
+            background-color: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+        }
+
+
+    .empty-state {
+        text-align: center;
+        padding: 2rem;
+        color: #6c757d;
+    }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #dee2e6;
+        }
+
+        .empty-state p {
+            margin: 0;
+        }
+</style>
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">

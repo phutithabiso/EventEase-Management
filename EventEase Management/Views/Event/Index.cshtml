@@ -1,0 +1,191 @@
+﻿@model  EventEase_Management.Models.EventModelView
+
+@{
+    ViewData["Title"] = "Add New Event";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+
+        h2 {
+            color: #007bff;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .form-group label {
+            font-weight: bold;
+        }
+
+        .form-control {
+            border-radius: 10px;
+            padding: 10px;
+            border: 1px solid #ced4da;
+        }
+
+            .form-control:focus {
+                border-color: #80bdff;
+                box-shadow: 0 0 5px rgba(0, 123, 255, 0.25);
+            }
+
+        .btn-success {
+            background-color: #28a745;
+            border-color: #28a745;
+            padding: 10px;
+            font-size: 16px;
+        }
+
+            .btn-success:hover {
+                background-color: #218838;
+                border-color: #1e7e34;
+            }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+        }
+
+            .btn-secondary:hover {
+                background-color: #5a6268;
+                border-color: #545b62;
+            }
+
+        .text-primary {
+            color: #007bff !important;
+        }
+
+        .img-fluid {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .row {
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <h2 class="mb-4 text-center text-primary">Add New Event</h2>
+    <hr>
+    <div class="row justify-content-center align-items-center">
+
+        <div class="col-md-6">
+            <form asp-action="AddEvent" enctype="multipart/form-data">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <!-- Name Section -->
+                <div class="form-group">
+                    <label asp-for="Name" class="control-label">Event Name</label>
+                    <input asp-for="Name" class="form-control" placeholder="Enter event name" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <!-- Date Section-->
+                <div class="form-group">
+                    <label asp-for="Date" class="control-label"> Date</label>
+                    <input asp-for="Date" type="date" class="form-control" />
+                    <span asp-validation-for="Date" class="text-danger"></span>
+                </div>
+
+                <!-- Description Section-->
+                <div class="form-group">
+                    <label asp-for="Description" class="control-label">Description</label>
+                    <textarea asp-for="Description" class="form-control" placeholder="Enter event description"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+                <!-- Status Section-->
+                <div class="form-group">
+                    <label asp-for="Status" class="control-label">Status</label>
+                    <select asp-for="Status" class="form-control" asp-items="ViewBag.Statuses">
+                        <option value="">Select Event Status</option>
+                    </select>
+                    <span asp-validation-for="Status" class="text-danger"></span>
+                </div>
+
+                <!-- Venue Section-->
+                <div class="form-group">
+                    <label asp-for="VenueId" class="control-label">Venue</label>
+                    <select asp-for="VenueId" class="form-control" asp-items="ViewBag.VenueId">
+                        <option value="">Select a Venue</option>
+                    </select>
+                    <span asp-validation-for="VenueId" class="text-danger"></span>
+                </div>
+
+                <!-- Image Section -->
+                <div class="mb-3">
+                    <label asp-for="ImageUrl" class="form-label fw-bold">Event Image</label>
+                    <input type="file" name="ImageFile" class="form-control" id="imageFileInput" />
+                    <br />
+                    <input asp-for="ImageUrl" class="form-control" placeholder="Or enter image URL" id="imageUrlInput" />
+                    <span asp-validation-for="ImageUrl" class="text-danger"></span>
+
+                    <div class="mt-3">
+                        <img id="imagePreview" src="" alt="Venue Image" class="img-fluid rounded shadow" style="max-width: 300px; display: none;" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <input type="submit" value="Create Event" class="btn btn-success btn-block" />
+                </div>
+            </form>
+        </div>
+
+        <div class="col-md-6 text-center">
+            <img src="~/assets/img1.jpeg" alt="Event Image" class="img-fluid" />
+        </div>
+    </div>
+
+    <div class="mt-3 text-center">
+        <a asp-action="ListEvent" class="btn btn-secondary">Back</a>
+    </div>
+
+    @section Scripts {
+        @{
+            await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        }
+        <script>
+            document.getElementById("imageUrlInput").addEventListener("input", function () {
+                let imageUrl = this.value;
+                let imagePreview = document.getElementById("imagePreview");
+
+                if (imageUrl) {
+                    imagePreview.src = imageUrl;
+                    imagePreview.style.display = "block";
+                } else {
+                    imagePreview.style.display = "none";
+                }
+            });
+
+            document.getElementById("imageFileInput").addEventListener("change", function () {
+                let file = this.files[0];
+                let imagePreview = document.getElementById("imagePreview");
+
+                if (file) {
+                    let reader = new FileReader();
+                    reader.onload = function (e) {
+                        imagePreview.src = e.target.result;
+                        imagePreview.style.display = "block";
+                    }
+                    reader.readAsDataURL(file);
+                } else {
+                    imagePreview.style.display = "none";
+                }
+            });
+        </script>
+    }
+</body>
+</html>
