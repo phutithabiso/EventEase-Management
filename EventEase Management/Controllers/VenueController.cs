@@ -2,6 +2,7 @@
 using EventEase_Management.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 
 namespace EventEase_Management.Controllers
 {
@@ -273,7 +274,11 @@ namespace EventEase_Management.Controllers
                 return RedirectToAction(nameof(Venuebook));
             }
         }
-
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error()
+        {
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
 
     }
 }

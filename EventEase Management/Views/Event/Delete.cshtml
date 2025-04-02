@@ -1,148 +1,101 @@
 ﻿@model EventEase_Management.Entity.Event
 
-@{
-    ViewData["Title"] = "Event Details";
-}
-
-<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
-
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #f8f9fa;
-        padding: 20px;
-    }
-
-    .container {
-        max-width: 800px;
-        padding: 20px;
-    }
-
-    .card {
-        background-color: #ffffff;
-        border-radius: 10px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        border: none;
-    }
-
-    .card-header {
-        background-color: #2c3e50;
-        color: white;
-        border-radius: 10px 10px 0 0 !important;
-    }
-
-    .btn-primary {
-        background-color: #3498db;
-        border-color: #3498db;
-    }
-
-    .btn-outline-secondary {
-        color: #6c757d;
-        border-color: #6c757d;
-    }
-
-    .font-weight-bold {
-        font-weight: 600;
-        color: #2c3e50;
-    }
-
-    .text-muted {
-        color: #7f8c8d !important;
-    }
-
-    .img-fluid {
-        max-width: 100%;
-        height: auto;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        border: 1px solid #dfe6e9;
-    }
-
-    .no-image {
-        background-color: #ecf0f1;
-        border: 1px dashed #bdc3c7;
-    }
-</style>
-
-<div class="container mt-5">
-    <div class="card">
-        <div class="card-header">
-            <h4 class="mb-0 text-center">Event Details</h4>
+<div class="container mt-4">
+    <div class="card border-danger">
+        <div class="card-header bg-danger text-white">
+            <h3 class="mb-0">Confirm Deletion</h3>
         </div>
-
         <div class="card-body">
-            <div class="row">
-                <!-- Left Column - Event Image -->
-                <div class="col-md-5">
-                    <div class="text-center mb-4">
+            <h4 class="card-title text-danger">Event Details</h4>
+            <hr class="border-danger" />
+
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="event-image-container mb-3">
                         @if (!string.IsNullOrEmpty(Model.ImageUrl))
                         {
-                            <img src="@Model.ImageUrl" alt="Event Image" class="img-fluid" style="max-height: 300px;" />
+                            <img src="@Model.ImageUrl" alt="Event Image" class="img-fluid rounded event-image">
                         }
                         else
                         {
-                            <div class="p-4 rounded no-image text-center">
-                                <i class="fas fa-image fa-3x text-muted mb-2"></i>
-                                <p class="text-muted">No image available</p>
+                            <div class="no-image-placeholder bg-light d-flex align-items-center justify-content-center rounded" style="height: 200px;">
+                                <span class="text-muted">No image available</span>
                             </div>
                         }
                     </div>
-
-                    <div class="text-center mt-3">
-                        <a href="@Model.ImageUrl" target="_blank" class="btn btn-sm btn-outline-secondary">
-                            <i class="fas fa-external-link-alt"></i> View Full Image
-                        </a>
-                    </div>
                 </div>
-
-                <!-- Right Column - Event Details -->
-                <div class="col-md-7">
+                <div class="col-md-6">
                     <dl class="row">
-                        <dt class="col-sm-4 font-weight-bold">
-                            @Html.DisplayNameFor(model => model.Name)
-                        </dt>
+                        <dt class="col-sm-4 text-muted">Event Name:</dt>
+                        <dd class="col-sm-8 font-weight-bold">@Html.DisplayFor(model => model.Name)</dd>
+
+                        <dt class="col-sm-4 text-muted">Date:</dt>
+                        <dd class="col-sm-8">@Html.DisplayFor(model => model.Date)</dd>
+
+                        <dt class="col-sm-4 text-muted">Status:</dt>
                         <dd class="col-sm-8">
-                            @Html.DisplayFor(model => model.Name)
+                            <span class="badge @(Model.Status == "Active" ? "badge-success" : "badge-secondary")">
+                                @Html.DisplayFor(model => model.Status)
+                            </span>
                         </dd>
 
-                        <dt class="col-sm-4 font-weight-bold">
-                            @Html.DisplayNameFor(model => model.Date)
-                        </dt>
-                        <dd class="col-sm-8">
-                            @Html.DisplayFor(model => model.Date)
-                        </dd>
-
-                        <dt class="col-sm-4 font-weight-bold">
-                            @Html.DisplayNameFor(model => model.Status)
-                        </dt>
-                        <dd class="col-sm-8">
-                            @Html.DisplayFor(model => model.Status)
-                        </dd>
-
-                        <dt class="col-sm-4 font-weight-bold">
-                            @Html.DisplayNameFor(model => model.Venues)
-                        </dt>
-                        <dd class="col-sm-8">
-                            @Html.DisplayFor(model => model.Venues.Name)
-                        </dd>
+                        <dt class="col-sm-4 text-muted">Venue:</dt>
+                        <dd class="col-sm-8">@Html.DisplayFor(model => model.Venues.Name)</dd>
                     </dl>
-
-                    <hr />
-
-                    <h5 class="font-weight-bold">Description</h5>
-                    <p class="text-justify">@Html.DisplayFor(model => model.Description)</p>
                 </div>
             </div>
-        </div>
 
-        <div class="card-footer bg-white text-right">
-            <a asp-action="Edit" asp-route-id="@Model?.EventID" class="btn btn-primary">
-                <i class="fas fa-edit"></i> Edit
-            </a>
-            <a asp-action="ListEvent" class="btn btn-outline-secondary ml-2">
-                <i class="fas fa-arrow-left"></i> Back to List
-            </a>
+            <div class="mb-3">
+                <dt class="text-muted">Description:</dt>
+                <dd class="p-3 bg-light rounded">@Html.DisplayFor(model => model.Description)</dd>
+            </div>
+
+            <div class="alert alert-warning" role="alert">
+                <i class="fas fa-exclamation-triangle mr-2"></i>
+                <strong>Warning:</strong> This action cannot be undone. All associated data will be permanently deleted.
+            </div>
+
+            <form asp-action="Delete" class="mt-4">
+                <input type="hidden" asp-for="EventID" />
+                <div class="form-group">
+                    <button type="submit" class="btn btn-danger btn-lg mr-2">
+                        <i class="fas fa-trash-alt mr-2"></i>Confirm Delete
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-secondary btn-lg">
+                        <i class="fas fa-arrow-left mr-2"></i>Back to List
+                    </a>
+                </div>
+            </form>
         </div>
     </div>
 </div>
+
+<style>
+    .event-image {
+        max-height: 250px;
+        object-fit: cover;
+        width: 100%;
+        border: 1px solid #dee2e6;
+    }
+
+    .no-image-placeholder {
+        height: 200px;
+        border: 1px dashed #ccc;
+    }
+
+    .card {
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    dt {
+        font-weight: 500;
+    }
+
+    .badge-success {
+        background-color: #28a745;
+    }
+
+    .badge-secondary {
+        background-color: #6c757d;
+    }
+</style>

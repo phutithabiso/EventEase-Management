@@ -3,6 +3,7 @@ using EventEase_Management.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 
 namespace EventEase_Management.Controllers
 {
@@ -77,41 +78,7 @@ namespace EventEase_Management.Controllers
         }
 
         // Add a new booking (POST)
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult AddBooking(BookingModelView model)
-        {
-            try
-            {
-                if (ModelState.IsValid)
-                {
-                    var bModel = new Booking
-                    {
-                        CustomerName = model.CustomerName,
-                        EventID = model.EventID,
-                        VenueId = model.VenueId,
-                        BookingDate = model.BookingDate,
-                        Status = model.Status
-                    };
-
-                    _context.Bookings.Add(bModel);
-                    _context.SaveChanges();
-                    TempData["SuccessMessage"] = "Booking added successfully!";
-                    return RedirectToAction("BookDetails");
-                }
-
-
-                ViewBag.VenueId = new SelectList(_context.Venues, "VenueID", "Name", model.VenueId);
-                ViewBag.EventId = new SelectList(_context.Events, "EventID", "Name", model.EventID);
-                return View(model);
-            }
-            catch (Exception ex)
-            {
-                TempData["ErrorMessage"] = "An error occurred while adding the booking: " + ex.Message;
-                return RedirectToAction("BookDetails");
-            }
-        }
-
+        
         // Edit booking view (GET)
         public IActionResult Edit(int id)
         {
@@ -185,7 +152,10 @@ namespace EventEase_Management.Controllers
                 return RedirectToAction("BookDetails");
             }
         }
-
+        public IActionResult Delete()
+        {
+            return View();
+        }
         //GET: Delete booking
         public IActionResult Delete(int id)
         {
@@ -207,6 +177,11 @@ namespace EventEase_Management.Controllers
             }
 
             return RedirectToAction("BookDetails");
+        }
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error()
+        {
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }

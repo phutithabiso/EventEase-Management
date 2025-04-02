@@ -3,6 +3,7 @@ using EventEase_Management.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 
 namespace EventEase_Management.Controllers
 {
@@ -101,7 +102,6 @@ namespace EventEase_Management.Controllers
                 ModelState.AddModelError("", "An unexpected error occurred. Please try again later.");
             }
 
-            // If error occurs, return back to form with dropdowns
             return View("Index", model);
         }
 
@@ -258,6 +258,11 @@ namespace EventEase_Management.Controllers
             if (o == null) return NotFound();
 
             return View(o);
+        }
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error()
+        {
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }
