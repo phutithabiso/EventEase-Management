@@ -17,6 +17,7 @@ namespace EventEase_Management.Controllers
             _context = context;
             _webHostEnvironment = webHostEnvironment;
         }
+        // get index
         public IActionResult Index()
         {
             var venues = _context.Venues.Select(v => new SelectListItem
@@ -37,27 +38,42 @@ namespace EventEase_Management.Controllers
 
             return View();
         }
-
+        // post method
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddEvent(EventModelView model, IFormFile ImageFile)
         {
-            if (ModelState.IsValid)
+            // Reload dropdowns if form reloads
+            ViewBag.VenueId = new SelectList(_context.Venues, "VenueID", "Name", model.VenueId);
+            ViewBag.Statuses = new List<SelectListItem>
+    {
+        new SelectListItem { Value = "Scheduled", Text = "Scheduled" },
+        new SelectListItem { Value = "Completed", Text = "Completed" },
+        new SelectListItem { Value = "Cancelled", Text = "Cancelled" }
+    };
+
+            if (!ModelState.IsValid)
             {
+                return View("Index", model);
+            }
+
+            try
+            {
+                // Handle image upload
                 if (ImageFile != null && ImageFile.Length > 0)
                 {
-                    var fileExtension = Path.GetExtension(ImageFile.FileName);
-                    var fileName = Guid.NewGuid().ToString() + fileExtension;
-                    string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "images", fileName);
+                    var uploadFolder = Path.Combine(_webHostEnvironment.WebRootPath ?? "wwwroot", "images");
+                    Directory.CreateDirectory(uploadFolder);
 
-                    Directory.CreateDirectory(Path.Combine(_webHostEnvironment.WebRootPath, "images"));
+                    var fileName = $"{Guid.NewGuid()}{Path.GetExtension(ImageFile.FileName)}";
+                    var filePath = Path.Combine(uploadFolder, fileName);
 
                     using (var fileStream = new FileStream(filePath, FileMode.Create))
                     {
                         await ImageFile.CopyToAsync(fileStream);
                     }
 
-                    model.ImageUrl = "/images/" + fileName;
+                    model.ImageUrl = $"/images/{fileName}";
                 }
 
                 var eventModel = new Event
@@ -67,30 +83,28 @@ namespace EventEase_Management.Controllers
                     Description = model.Description,
                     Status = model.Status,
                     VenueId = model.VenueId,
-                    //ImageUrl = model.ImageUrl,
+                    ImageUrl = model.ImageUrl
                 };
 
-                try
-                {
-                    _context.Events.Add(eventModel);
-                    await _context.SaveChangesAsync();
-                    TempData["Message"] = $"Event '{eventModel.Name}' was successfully added!";
-                    return RedirectToAction("Index");
-                }
-                catch (DbUpdateException dbEx)
-                {
-                    Console.WriteLine($"Error occurred while adding event: {dbEx.Message}");
-                    ModelState.AddModelError("", "We cannot process your request now, please try again later.");
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"An unexpected error occurred: {ex.Message}");
-                    ModelState.AddModelError("", "An unexpected error occurred. Please try again later.");
-                }
+                _context.Events.Add(eventModel);
+                await _context.SaveChangesAsync();
+
+                TempData["Message"] = $"Event '{eventModel.Name}' was successfully added!";
+                return RedirectToAction("Index");
+            }
+            catch (DbUpdateException)
+            {
+                ModelState.AddModelError("", "Database error: Unable to add event. Please try again later.");
+            }
+            catch (Exception)
+            {
+                ModelState.AddModelError("", "An unexpected error occurred. Please try again later.");
             }
 
+            // If error occurs, return back to form with dropdowns
             return View("Index", model);
         }
+
 
 
 
@@ -146,11 +160,13 @@ namespace EventEase_Management.Controllers
         }
 
         [HttpPost]
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, EventModelView model, IFormFile ImageFile)
         {
             if (!ModelState.IsValid)
             {
+                ViewBag.VenueId = new SelectList(_context.Venues, "VenueID", "Name", model.VenueId);
                 return View(model);
             }
 
@@ -161,24 +177,31 @@ namespace EventEase_Management.Controllers
                 return View(model);
             }
 
-            // Handle image upload
+            if (id != model.EventID)
+            {
+                ModelState.AddModelError("", "Invalid event update request.");
+                return View(model);
+            }
+
+            // Handle image upload if a new file is provided
             if (ImageFile != null && ImageFile.Length > 0)
             {
-                var fileExtension = Path.GetExtension(ImageFile.FileName);
-                var fileName = Guid.NewGuid().ToString() + fileExtension;
-                var filePath = Path.Combine(_webHostEnvironment.WebRootPath, "images", fileName);
+                var uploadFolder = Path.Combine(_webHostEnvironment.WebRootPath ?? "wwwroot", "images");
+                Directory.CreateDirectory(uploadFolder);
 
-                Directory.CreateDirectory(Path.Combine(_webHostEnvironment.WebRootPath, "images"));
+                var fileExtension = Path.GetExtension(ImageFile.FileName);
+                var fileName = $"{Guid.NewGuid()}{fileExtension}";
+                var filePath = Path.Combine(uploadFolder, fileName);
 
                 using (var fileStream = new FileStream(filePath, FileMode.Create))
                 {
                     await ImageFile.CopyToAsync(fileStream);
                 }
 
-                existingEvent.ImageUrl = "/images/" + fileName;
+                existingEvent.ImageUrl = $"/images/{fileName}";
             }
 
-
+            // Update existing event from model
             existingEvent.Name = model.Name;
             existingEvent.Date = model.Date;
             existingEvent.Description = model.Description;
@@ -197,6 +220,8 @@ namespace EventEase_Management.Controllers
                 ModelState.AddModelError("", "We cannot process your request now, please try again later.");
             }
 
+            // Preserve dropdown data if form reloads due to an error
+            ViewBag.VenueId = new SelectList(_context.Venues, "VenueID", "Name", model.VenueId);
             return View(model);
         }
 
